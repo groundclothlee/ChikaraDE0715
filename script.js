@@ -1,34 +1,60 @@
-const card = document.getElementById("card");
+const card = document.getElementById('card');
 
 let rotationY = 0;
 let velocity = 0;
-let lastMouseX = null;
-let animationFrameId;
+let lastX = null;
+let animationFrame;
 
-function animateInertia() {
-  if (Math.abs(velocity) < 0.05) return; // 停止動畫
-  rotationY += velocity;
-  velocity *= 0.95; // 慣性衰減
+function applyTransform() {
   card.style.transform = `rotateY(${rotationY}deg)`;
-  animationFrameId = requestAnimationFrame(animateInertia);
 }
 
-document.addEventListener("mousemove", (e) => {
-  if (lastMouseX === null) {
-    lastMouseX = e.clientX;
+function animateInertia() {
+  if (Math.abs(velocity) < 0.05) return;
+  rotationY += velocity;
+  velocity *= 0.95;
+  applyTransform();
+  animationFrame = requestAnimationFrame(animateInertia);
+}
+
+// 滑鼠事件
+document.addEventListener('mousemove', (e) => {
+  if (lastX === null) {
+    lastX = e.clientX;
+    return;
+  }
+  const delta = e.clientX - lastX;
+  velocity = delta * 0.3;
+  rotationY += velocity;
+  applyTransform();
+  lastX = e.clientX;
+  if (animationFrame) cancelAnimationFrame(animationFrame);
+});
+
+document.addEventListener('mouseleave', () => {
+  lastX = null;
+  animateInertia();
+});
+
+// 觸控事件
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length !== 1) return;
+
+  const touchX = e.touches[0].clientX;
+  if (lastX === null) {
+    lastX = touchX;
     return;
   }
 
-  const deltaX = e.clientX - lastMouseX;
-  velocity = deltaX * 0.3;
+  const delta = touchX - lastX;
+  velocity = delta * 0.3;
   rotationY += velocity;
-  card.style.transform = `rotateY(${rotationY}deg)`;
-  lastMouseX = e.clientX;
+  applyTransform();
+  lastX = touchX;
+  if (animationFrame) cancelAnimationFrame(animationFrame);
+}, { passive: true });
 
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
-});
-
-document.addEventListener("mouseleave", () => {
-  lastMouseX = null;
+document.addEventListener('touchend', () => {
+  lastX = null;
   animateInertia();
 });
