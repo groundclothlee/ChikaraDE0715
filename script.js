@@ -7,7 +7,7 @@ let velocityX = 0;
 let velocityY = 0;
 let lastX = null;
 let lastY = null;
-let isInside = false;
+let dragging = false;
 let animationFrame;
 
 function applyTransform() {
@@ -15,83 +15,75 @@ function applyTransform() {
 }
 
 function animateInertia() {
-  if (!isInside) {
-    if (Math.abs(velocityX) > 0.05 || Math.abs(velocityY) > 0.05) {
-      rotationY += velocityX;
-      rotationX -= velocityY;
-      velocityX *= 0.95;
-      velocityY *= 0.95;
-      applyTransform();
-      animationFrame = requestAnimationFrame(animateInertia);
-    }
+  if (Math.abs(velocityX) > 0.05 || Math.abs(velocityY) > 0.05) {
+    rotationY += velocityX;
+    rotationX -= velocityY;
+    velocityX *= 0.95;
+    velocityY *= 0.95;
+    applyTransform();
+    animationFrame = requestAnimationFrame(animateInertia);
   }
 }
 
-// 滑鼠事件
-scene.addEventListener('mouseenter', () => {
-  isInside = true;
-  lastX = null;
-  lastY = null;
+// 🖱 滑鼠控制
+scene.addEventListener('mousedown', (e) => {
+  dragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
   if (animationFrame) cancelAnimationFrame(animationFrame);
 });
 
-scene.addEventListener('mouseleave', () => {
-  isInside = false;
-  lastX = null;
-  lastY = null;
-  animateInertia();
-});
-
-scene.addEventListener('mousemove', (e) => {
-  if (!isInside) return;
-  if (lastX === null || lastY === null) {
-    lastX = e.clientX;
-    lastY = e.clientY;
-    return;
-  }
+document.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
 
   const deltaX = e.clientX - lastX;
   const deltaY = e.clientY - lastY;
+
   velocityX = deltaX * 0.5;
   velocityY = deltaY * 0.5;
+
   rotationY += velocityX;
-  rotationX -= velocityY; // 注意是減，符合畫面方向
+  rotationX -= velocityY;
+
   applyTransform();
+
   lastX = e.clientX;
   lastY = e.clientY;
 });
 
-// 觸控事件
-scene.addEventListener('touchstart', () => {
-  isInside = true;
-  lastX = null;
-  lastY = null;
+document.addEventListener('mouseup', () => {
+  dragging = false;
+  animateInertia();
+});
+
+// 📱 觸控控制
+scene.addEventListener('touchstart', (e) => {
+  if (e.touches.length !== 1) return;
+  lastX = e.touches[0].clientX;
+  lastY = e.touches[0].clientY;
   if (animationFrame) cancelAnimationFrame(animationFrame);
 });
 
 scene.addEventListener('touchmove', (e) => {
-  if (!isInside || e.touches.length !== 1) return;
-  const touch = e.touches[0];
-  if (lastX === null || lastY === null) {
-    lastX = touch.clientX;
-    lastY = touch.clientY;
-    return;
-  }
+  if (e.touches.length !== 1) return;
+  const touchX = e.touches[0].clientX;
+  const touchY = e.touches[0].clientY;
 
-  const deltaX = touch.clientX - lastX;
-  const deltaY = touch.clientY - lastY;
+  const deltaX = touchX - lastX;
+  const deltaY = touchY - lastY;
+
   velocityX = deltaX * 0.5;
   velocityY = deltaY * 0.5;
+
   rotationY += velocityX;
   rotationX -= velocityY;
+
   applyTransform();
-  lastX = touch.clientX;
-  lastY = touch.clientY;
+
+  lastX = touchX;
+  lastY = touchY;
 });
 
 scene.addEventListener('touchend', () => {
-  isInside = false;
-  lastX = null;
-  lastY = null;
   animateInertia();
 });
