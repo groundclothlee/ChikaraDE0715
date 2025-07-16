@@ -7,7 +7,7 @@ let velocityX = 0;
 let velocityY = 0;
 let lastX = null;
 let lastY = null;
-let dragging = false;
+let isInside = false;
 let animationFrame;
 
 function applyTransform() {
@@ -25,16 +25,29 @@ function animateInertia() {
   }
 }
 
-// 🖱 滑鼠控制
-scene.addEventListener('mousedown', (e) => {
-  dragging = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
+// ✅ 滑鼠進入圖片範圍才控制
+scene.addEventListener('mouseenter', () => {
+  isInside = true;
+  lastX = null;
+  lastY = null;
   if (animationFrame) cancelAnimationFrame(animationFrame);
 });
 
-document.addEventListener('mousemove', (e) => {
-  if (!dragging) return;
+scene.addEventListener('mouseleave', () => {
+  isInside = false;
+  lastX = null;
+  lastY = null;
+  animateInertia();
+});
+
+scene.addEventListener('mousemove', (e) => {
+  if (!isInside) return;
+
+  if (lastX === null || lastY === null) {
+    lastX = e.clientX;
+    lastY = e.clientY;
+    return;
+  }
 
   const deltaX = e.clientX - lastX;
   const deltaY = e.clientY - lastY;
@@ -51,12 +64,7 @@ document.addEventListener('mousemove', (e) => {
   lastY = e.clientY;
 });
 
-document.addEventListener('mouseup', () => {
-  dragging = false;
-  animateInertia();
-});
-
-// 📱 觸控控制
+// ✅ 手機觸控
 scene.addEventListener('touchstart', (e) => {
   if (e.touches.length !== 1) return;
   lastX = e.touches[0].clientX;
