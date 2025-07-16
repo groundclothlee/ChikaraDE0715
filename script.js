@@ -1,26 +1,41 @@
-let rotationY = 0;
-let isDragging = false;
-let lastX = 0;
+body, html {
+  margin: 0;
+  height: 100%;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  perspective: 1200px;
+}
 
-const container = document.getElementById('imageContainer');
+.scene {
+  width: 400px;
+  height: 400px;
+  position: relative;
+}
 
-document.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  lastX = e.clientX;
-});
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
+}
 
-document.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  const deltaX = e.clientX - lastX;
-  rotationY += deltaX * 0.5; // 控制旋轉速度
-  container.style.transform = `rotateY(${rotationY}deg)`;
-  lastX = e.clientX;
-});
+.face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
 
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
+.front img {
+  width: 100%;
+  height: auto;
+}
 
-document.addEventListener('mouseleave', () => {
-  isDragging = false;
-});
+.back {
+  background: white;
+  transform: rotateY(180deg);
+}
