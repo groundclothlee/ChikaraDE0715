@@ -1,8 +1,10 @@
 const card = document.getElementById('card');
+const scene = document.querySelector('.scene');
 
 let rotationY = 0;
 let velocity = 0;
 let lastX = null;
+let isInside = false;
 let animationFrame;
 
 function applyTransform() {
@@ -10,15 +12,33 @@ function applyTransform() {
 }
 
 function animateInertia() {
-  if (Math.abs(velocity) < 0.05) return;
-  rotationY += velocity;
-  velocity *= 0.95;
-  applyTransform();
-  animationFrame = requestAnimationFrame(animateInertia);
+  if (!isInside) {
+    if (Math.abs(velocity) > 0.05) {
+      rotationY += velocity;
+      velocity *= 0.95;
+      applyTransform();
+      animationFrame = requestAnimationFrame(animateInertia);
+    }
+  }
 }
 
-// 滑鼠事件
-document.addEventListener('mousemove', (e) => {
+// 滑鼠進入 scene 才允許操作
+scene.addEventListener('mouseenter', () => {
+  isInside = true;
+  lastX = null;
+  if (animationFrame) cancelAnimationFrame(animationFrame);
+});
+
+// 滑鼠離開 scene 後進入慣性模式
+scene.addEventListener('mouseleave', () => {
+  isInside = false;
+  lastX = null;
+  animateInertia();
+});
+
+// 滑鼠滑動
+scene.addEventListener('mousemove', (e) => {
+  if (!isInside) return;
   if (lastX === null) {
     lastX = e.clientX;
     return;
@@ -28,18 +48,17 @@ document.addEventListener('mousemove', (e) => {
   rotationY += velocity;
   applyTransform();
   lastX = e.clientX;
+});
+
+// 觸控支援
+scene.addEventListener('touchstart', () => {
+  isInside = true;
+  lastX = null;
   if (animationFrame) cancelAnimationFrame(animationFrame);
 });
 
-document.addEventListener('mouseleave', () => {
-  lastX = null;
-  animateInertia();
-});
-
-// 觸控事件
-document.addEventListener('touchmove', (e) => {
-  if (e.touches.length !== 1) return;
-
+scene.addEventListener('touchmove', (e) => {
+  if (!isInside || e.touches.length !== 1) return;
   const touchX = e.touches[0].clientX;
   if (lastX === null) {
     lastX = touchX;
@@ -51,10 +70,10 @@ document.addEventListener('touchmove', (e) => {
   rotationY += velocity;
   applyTransform();
   lastX = touchX;
-  if (animationFrame) cancelAnimationFrame(animationFrame);
-}, { passive: true });
+});
 
-document.addEventListener('touchend', () => {
+scene.addEventListener('touchend', () => {
+  isInside = false;
   lastX = null;
   animateInertia();
 });
