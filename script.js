@@ -25,7 +25,7 @@ function animateInertia() {
   }
 }
 
-// ✅ 滑鼠進入圖片範圍才控制
+//  滑鼠進入圖片範圍才控制
 scene.addEventListener('mouseenter', () => {
   isInside = true;
   lastX = null;
@@ -64,7 +64,7 @@ scene.addEventListener('mousemove', (e) => {
   lastY = e.clientY;
 });
 
-// ✅ 手機觸控
+//  手機觸控
 scene.addEventListener('touchstart', (e) => {
   if (e.touches.length !== 1) return;
   lastX = e.touches[0].clientX;
