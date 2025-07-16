@@ -54,9 +54,9 @@ body, html {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  font-family: sans-serif;
+  font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; /* 黑體 */
   font-size: 16px;
-  color: #ddd;
+  color: white; /* 白色字 */
   text-decoration: none;
   background: rgba(0, 0, 0, 0.5);
   padding: 6px 12px;
