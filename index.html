@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>3D PNG Rotation</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D PNG Viewer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="scene">
-    <div class="image-container" id="imageContainer">
-      <img src="https://images.plurk.com/EMC97lprlp74biYIkO2y3.png" alt="Rotatable PNG" />
+    <div class="card" id="card">
+      <div class="face front">
+        <img src="https://images.plurk.com/EMC97lprlp74biYIkO2y3.png" alt="Front PNG" />
+      </div>
+      <div class="face back"></div>
     </div>
   </div>
   <script src="script.js"></script>
