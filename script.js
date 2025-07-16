@@ -1,41 +1,34 @@
-body, html {
-  margin: 0;
-  height: 100%;
-  background: #111;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  perspective: 1200px;
+const card = document.getElementById("card");
+
+let rotationY = 0;
+let velocity = 0;
+let lastMouseX = null;
+let animationFrameId;
+
+function animateInertia() {
+  if (Math.abs(velocity) < 0.05) return; // 停止動畫
+  rotationY += velocity;
+  velocity *= 0.95; // 慣性衰減
+  card.style.transform = `rotateY(${rotationY}deg)`;
+  animationFrameId = requestAnimationFrame(animateInertia);
 }
 
-.scene {
-  width: 400px;
-  height: 400px;
-  position: relative;
-}
+document.addEventListener("mousemove", (e) => {
+  if (lastMouseX === null) {
+    lastMouseX = e.clientX;
+    return;
+  }
 
-.card {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.1s linear;
-}
+  const deltaX = e.clientX - lastMouseX;
+  velocity = deltaX * 0.3;
+  rotationY += velocity;
+  card.style.transform = `rotateY(${rotationY}deg)`;
+  lastMouseX = e.clientX;
 
-.face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+});
 
-.front img {
-  width: 100%;
-  height: auto;
-}
-
-.back {
-  background: white;
-  transform: rotateY(180deg);
-}
+document.addEventListener("mouseleave", () => {
+  lastMouseX = null;
+  animateInertia();
+});
