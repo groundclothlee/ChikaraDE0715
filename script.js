@@ -44,7 +44,7 @@ scene.addEventListener('mousemove', (e) => {
     return;
   }
   const delta = e.clientX - lastX;
-  velocity = delta * 0.3;
+  velocity = delta * 0.6;
   rotationY += velocity;
   applyTransform();
   lastX = e.clientX;
